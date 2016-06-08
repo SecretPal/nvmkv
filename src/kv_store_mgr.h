@@ -642,7 +642,8 @@ class NVM_KV_Store_Mgr
         int kv_process_for_trim(uint32_t value_len, uint32_t trim_len,
                                 nvm_iovec_t *iovec, uint32_t *iovec_count,
                                 uint64_t lba,
-                                nvm_kv_store_device_t *kv_device);
+                                nvm_kv_store_device_t *kv_device,
+				uint32_t * num_iovs);
         ///
         ///internal API used for checking if the key is expired or not.
         ///If it is, delete is issued on that perticular key

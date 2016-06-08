@@ -417,7 +417,7 @@ int NVM_KV_Store_Mgr::kv_put(int id, int pool_id, nvm_kv_key_t *key,
     }
 
     ret_code = kv_process_for_trim(value_len, trim_len, iovec, &iovec_index,
-                                   key_hash_val, kv_device);
+                                   key_hash_val, kv_device,&num_iovs);
     if (ret_code != NVM_SUCCESS)
     {
         goto end_kv_put;
@@ -914,7 +914,7 @@ int NVM_KV_Store_Mgr::kv_batch_put(int id, int pool_id, nvm_kv_iovec_t *kv_iov,
                                                         &kv_iov[i]));
         ret_code = kv_process_for_trim(kv_iov[i].value_len, trim_len,
                                        iovec_trm, &idx_trm,
-                                       key_hash_val[i], kv_device);
+                                       key_hash_val[i], kv_device,&num_iovs);
         if (ret_code != NVM_SUCCESS)
         {
             goto end_kv_batch_put;
@@ -2099,7 +2099,8 @@ int NVM_KV_Store_Mgr::kv_process_for_write(int pool_id, nvm_kv_key_t *key,
 int NVM_KV_Store_Mgr::kv_process_for_trim(uint32_t value_len, uint32_t trim_len,
                                           nvm_iovec_t *iovec,
                                           uint32_t *iovec_count, uint64_t lba,
-                                          nvm_kv_store_device_t *kv_device)
+                                          nvm_kv_store_device_t *kv_device,
+					uint32_t * num_iovs)
 {
     uint64_t max_trim_size_per_iov = 0;
     uint32_t sector_size = kv_device->capabilities.nvm_sector_size;
@@ -2129,7 +2130,8 @@ int NVM_KV_Store_Mgr::kv_process_for_trim(uint32_t value_len, uint32_t trim_len,
             iovec[*iovec_count].iov_lba = lba + (value_bytes / sector_size);
             iovec[*iovec_count].iov_opcode = NVM_IOV_TRIM;
             *iovec_count = (*iovec_count) + 1;
-        }
+	    *num_iovs = (*num_iovs) + 1; 
+       }
     }
     return NVM_SUCCESS;
 }
