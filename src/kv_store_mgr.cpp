@@ -550,6 +550,8 @@ int NVM_KV_Store_Mgr::kv_get(int id, int pool_id, nvm_kv_key_t *key,
     if (hdr->value_offset < sector_size)
     {
         memcpy(value, buf + hdr->value_offset, hdr->value_len);
+    	if(hdr->value_len < strlen((char*)value))
+		((char*)value)[hdr->value_len] = '\0';
     }
     key_info->gen_count = hdr->metadata.gen_count;
     key_info->expiry = hdr->metadata.expiry;
@@ -2061,6 +2063,8 @@ int NVM_KV_Store_Mgr::kv_process_for_write(int pool_id, nvm_kv_key_t *key,
         temp_buf = buf;
         val_buf = buf + value_offset;
         memcpy(val_buf, value, value_len);
+	if(value_len < strlen(val_buf))
+		val_buf[value_len] = '\0';
         remaining_len = sector_size;
     }
 
